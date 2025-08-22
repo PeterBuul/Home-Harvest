@@ -346,7 +346,7 @@ function App() {
       </main>
 
       <footer className="text-center p-4 text-sm text-gray-600 mt-8">
-        <p>&copy; 2025 Gardener's Companion. Happy Gardening! 🥕</p>
+        <p>&copy; 2025 Home Harvest. All Rights Reserved. 🥕</p>
       </footer>
     </div>
   );
