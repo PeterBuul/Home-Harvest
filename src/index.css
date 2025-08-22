@@ -1,11 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+body {
+    background-color: #f0ead6; /* A soft, earthy beige background */
+}
