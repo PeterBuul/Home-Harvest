@@ -95,6 +95,7 @@ const plantData = [
     { name: "Avocado", scientific: "Persea americana", planting: { "Cold": "Not suitable", "Temperate": "Spring (pots)", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring (with care)" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.5", harvest: "1825", water: 14, size: "10m+ H x 8m W", spacing: "8-10m apart" },
 ];
 
+const logoSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNNTAsMi41QzM1LDIuNSwyNSwxNSwyNSwyNSBjMCwxMCwxMCwzNSwzNSwzNVM4NSwzNSw4NSwyNEM4NSwxNSw2NSwyLjUsNTAsMi41ek01MCw0MCBDNDAuMDM4LDQwLDMyLjUsNDcuNTM4LDMyLjUsNTcuNUMzMi41LDY3LjQ2Miw0MC4wMzgsNzUsNTAsNzUgUzY3LjUsNjcuNDYyLDY3LjUsNTcuNUM2Ny41LDQ3LjUzOCw1OS45NjIsNDAsNTAsNDB6IiBmaWxsPSIjMkU1NzIyIj48L3BhdGgPjxwYXRoIGQ9Ik01MCwzMi41Yy0xMi40MjUsMC0yMi41LDEwLjA3NS0yMi41LDIyLjVjMCwxMi40MjUsMTAuMDc1LDIyLjUsMjIuNSwyMi41czIyLjUtMTAuMDc1LDIyLjUtMjIuNSBDNzIuNSw0Mi41NzUsNjIuNDI1LDMyLjUsNTAsMzIuNXoiIGZpbGw9IiM2Q0E4NDYiPjwvcGF0aD48cGF0aCBkPSJNNTAsMy43NWMxMi4xMjYsMCwyMS44NzUsOS43NDksMjEuODc1LDIxLjg3NVM2Mi4xMjYsNDcuNSw1MCw0Ny41cy0yMS44NzUtOS43NDktMjEuODc1LTIxLjg3NSBTMzcuODc0LDMuNzUsNTAsMy43NXoiIGZpbGw9IiM2Q0E4NDYiPjxwYXRoIGQ9Ik01MS4yNSw2Mi41SDQ4Ljc1Yy01LjUyMywwLTEwLTQuNDc3LTEwLTEwYzAtMi43NjEsMS4xMi01LjI2MSwyLjkzLTcuMDdDNDAuODgsNDQuNTcsNDAsNDMuMDcsNDAsNDEuMjUgYzAtMi4wNzEsMS42NzktMy43NSwzLjc1LTMuNzVjMS4wMzYsMCwxLjk3NCwwLjQyLDIuNjUyLDEuMTAxQzQ3LjA3NiwzOC4xODEsNDguNDY0LDM3LjUsNTAsMzcuNSBjMS4yNDEsMCwyLjM4LDAuNTE5LDMuMjAxLDEuMzM3QzUzLjg4NSwzOC4yMDQsNTQuNjc0LDM3LjUsNTUuNjI1LDM3LjVjMi4wNzEsMCwzLjc1LDEuNjc5LDMuNzUsMy43NSBjMCwxLjM0MS0wLjcxNSwyLjUzOS0xLjc5NywzLjE5MUM1OS4xMTUsNDguNDc0LDYwLDQ5LjY1OSw2MCw1MS4yNSIgZmlsbD0iI0ZGRiI+PC9wYXRoPjwvc3ZnPg==";
 const countryHemispheres = { "Australia": "Southern", "USA": "Northern", "Canada": "Northern", "UK": "Northern", "Germany": "Northern", "France": "Northern", "India": "Northern", "China": "Northern", "Brazil": "Southern", "South Africa": "Southern", "New Zealand": "Southern", "Japan": "Northern", "Russia": "Northern", "Italy": "Northern", "Spain": "Northern", "Mexico": "Northern", "Argentina": "Southern", "Egypt": "Northern", "Nigeria": "Northern", "Indonesia": "Southern", };
 const seasonStartMonths = {
   Northern: { Spring: 2, Summer: 5, Autumn: 8, Winter: 11 },
@@ -387,7 +388,7 @@ function App() {
         {gardenPlan.length > 0 && (
             <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
                 <div id="garden-plan-section">
-                    <div className="flex justify-between items-center mb-4 print:hidden">
+                    <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
                         <button
                             onClick={handleDownloadPdf}
@@ -396,7 +397,7 @@ function App() {
                             Download Plan as PDF
                         </button>
                     </div>
-                    <p className="mb-6 text-gray-600 print:hidden">These beds group plants with similar sun, soil, and water needs. The timeline is staggered to spread out your planting and harvesting.</p>
+                    <p className="mb-6 text-gray-600">These beds group plants with similar sun, soil, and water needs. The timeline is staggered to spread out your planting and harvesting.</p>
                     
                     <div className="space-y-8">
                         {plannedBeds.map((bed, index) => (
