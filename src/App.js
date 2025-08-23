@@ -1,5 +1,5 @@
+// Force rebuild on Aug 23, 2025
 import React, { useState, useMemo } from 'react';
-
 // --- DATA ---
 // A simplified climate mapping based on general zones.
 const locations = {
