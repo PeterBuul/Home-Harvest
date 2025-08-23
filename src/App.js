@@ -80,11 +80,12 @@ function App() {
         const bedAvgPh = getAveragePh(bed.soil);
         
         const positionMatch = bed.position === plant.position;
-        const waterMatch = bed.water === plant.water; // ADDED: Check for matching water cycle
+        // REVISED: Water compatibility check with a 2-day tolerance
+        const waterCompatible = Math.abs(bed.water - plant.water) <= 2;
         const phCompatible = (plantAvgPh === null && bedAvgPh === null) || 
                              (plantAvgPh !== null && bedAvgPh !== null && Math.abs(plantAvgPh - bedAvgPh) <= 0.5);
 
-        if (positionMatch && phCompatible && waterMatch) {
+        if (positionMatch && phCompatible && waterCompatible) {
           bed.plants.push(plant);
           foundBed = true;
           break;
@@ -95,7 +96,7 @@ function App() {
         beds.push({
           position: plant.position,
           soil: plant.soil,
-          water: plant.water, // ADDED: Store water cycle on the bed
+          water: plant.water,
           plants: [plant]
         });
       }
@@ -174,7 +175,6 @@ function App() {
       </header>
 
       <main className="p-4 md:p-8">
-        {/* REMOVED backdrop-blur-sm to fix dropdown issue */}
         <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
           <h2 className="text-2xl font-semibold text-green-800 mb-4">Find Your Perfect Plant</h2>
           
@@ -226,7 +226,6 @@ function App() {
         </section>
 
         {selectedPlant && (
-          // REMOVED backdrop-blur-sm to fix dropdown issue
           <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
             <div className="flex justify-between items-start">
                 <div>
@@ -265,7 +264,6 @@ function App() {
         )}
         
         {gardenPlan.length > 0 && (
-            // REMOVED backdrop-blur-sm to fix dropdown issue
             <section id="garden-plan-section" className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
@@ -285,8 +283,8 @@ function App() {
                                 Bed {index + 1}: <span className="font-medium">{bed.position}</span>
                             </h3>
                             <div className="text-sm text-gray-600 mb-3 -mt-1 space-y-1">
-                                <p><span className="font-semibold">Soil Type:</span> {bed.soil}</p>
-                                <p><span className="font-semibold">Watering:</span> Every {bed.water} days</p>
+                                <p><span className="font-semibold">Representative Soil Type:</span> {bed.soil}</p>
+                                <p><span className="font-semibold">Watering Schedule:</span> Approx. every {bed.water} days</p>
                             </div>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
                                 <table className="min-w-full divide-y divide-gray-200">
