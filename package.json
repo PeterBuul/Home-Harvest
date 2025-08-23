@@ -2,7 +2,7 @@
   "name": "gardening-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://peterbuul.github.io/home-harvest",
+  "homepage": "https://peterbuul.github.io/home-harvest/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
