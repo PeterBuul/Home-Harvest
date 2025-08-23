@@ -1,7 +1,7 @@
+// A comment to force a rebuild on Sat Aug 23 2025
 import React, { useState, useMemo } from 'react';
 
 // --- DATA ---
-// (The extensive plant data is still here, just hidden for brevity)
 const locations = { "Australia": {"Sydney": "Temperate", "Melbourne": "Temperate", "Brisbane": "Subtropical", "Perth": "Mediterranean"}, "USA": {"New York": "Cold", "Los Angeles": "Mediterranean", "Chicago": "Cold", "Miami": "Tropical"}, "Canada": {"Toronto": "Cold", "Vancouver": "Temperate", "Montreal": "Cold"}, "UK": {"London": "Temperate", "Manchester": "Temperate", "Edinburgh": "Cold"}, "Germany": {"Berlin": "Cold", "Munich": "Cold", "Hamburg": "Temperate"}, "France": {"Paris": "Temperate", "Marseille": "Mediterranean", "Lyon": "Temperate"}, "India": {"Delhi": "Subtropical", "Mumbai": "Tropical", "Bangalore": "Tropical"}, "China": {"Beijing": "Cold", "Shanghai": "Subtropical", "Guangzhou": "Subtropical"}, "Brazil": {"São Paulo": "Subtropical", "Rio de Janeiro": "Tropical", "Brasília": "Tropical"}, "South Africa": {"Johannesburg": "Temperate", "Cape Town": "Mediterranean", "Durban": "Subtropical"}, "New Zealand": {"Auckland": "Temperate", "Wellington": "Temperate", "Christchurch": "Temperate"}, "Japan": {"Tokyo": "Temperate", "Osaka": "Temperate", "Sapporo": "Cold"}, "Russia": {"Moscow": "Cold", "Saint Petersburg": "Cold"}, "Italy": {"Rome": "Mediterranean", "Milan": "Temperate"}, "Spain": {"Madrid": "Mediterranean", "Barcelona": "Mediterranean"}, "Mexico": {"Mexico City": "Temperate", "Cancun": "Tropical"}, "Argentina": {"Buenos Aires": "Temperate"}, "Egypt": {"Cairo": "Hot/Arid"}, "Nigeria": {"Lagos": "Tropical"}, "Indonesia": {"Jakarta": "Tropical"}, };
 const plantData = [ { name: "Tomato", scientific: "Solanum lycopersicum", planting: { "Cold": "Late Spring", "Temperate": "Early Spring", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Early Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.8", harvest: 60-85, water: 3 }, { name: "Carrot", scientific: "Daucus carota", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Loose, sandy, pH 6.0-7.0", harvest: 70-80, water: 4 }, { name: "Lettuce", scientific: "Lactuca sativa", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "High altitude/Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn/Winter" }, position: "Partial Shade", soil: "Rich, moist, pH 6.0-7.0", harvest: 30-70, water: 2 }, { name: "Cucumber", scientific: "Cucumis sativus", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Early Spring/Autumn" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 50-70, water: 2 }, { name: "Bell Pepper", scientific: "Capsicum annuum", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Late Summer/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Early Spring/Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.8", harvest: 60-90, water: 3 }, { name: "Broccoli", scientific: "Brassica oleracea var. italica", planting: { "Cold": "Early Spring", "Temperate": "Late Summer/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, pH 6.0-7.0", harvest: 60-100, water: 4 }, { name: "Spinach", scientific: "Spinacia oleracea", planting: { "Cold": "Early Spring/Autumn", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "High altitude only", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Well-drained, rich, pH 6.5-7.5", harvest: 40-50, water: 3 }, { name: "Potato", scientific: "Solanum tuberosum", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Autumn", "Tropical": "Dry Season (high alt.)", "Mediterranean": "Winter/Early Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Acidic, loose, pH 4.8-6.5", harvest: 70-120, water: 5 }, { name: "Onion", scientific: "Allium cepa", planting: { "Cold": "Early Spring", "Temperate": "Autumn/Early Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, fertile, pH 6.0-7.0", harvest: 90-120, water: 7 }, { name: "Garlic", scientific: "Allium sativum", planting: { "Cold": "Autumn", "Temperate": "Autumn", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, sandy loam, pH 6.0-7.0", harvest: 240-270, water: 7 }, { name: "Zucchini", scientific: "Cucurbita pepo", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Early Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.5", harvest: 40-60, water: 3 }, { name: "Radish", scientific: "Raphanus sativus", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Loose, well-drained, pH 6.0-7.0", harvest: 20-30, water: 2 }, { name: "Pea", scientific: "Pisum sativum", planting: { "Cold": "Early Spring", "Temperate": "Autumn/Early Spring", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.5", harvest: 60-70, water: 4 }, { name: "Corn", scientific: "Zea mays", planting: { "Cold": "Late Spring", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-6.8", harvest: 60-100, water: 4 }, { name: "Bean", scientific: "Phaseolus vulgaris", planting: { "Cold": "Late Spring", "Temperate": "Spring/Summer", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.0", harvest: 50-75, water: 3 }, { name: "Kale", scientific: "Brassica oleracea var. sabellica", planting: { "Cold": "Early Spring/Late Summer", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.5", harvest: 55-75, water: 4 }, { name: "Eggplant", scientific: "Solanum melongena", planting: { "Cold": "Late Spring (indoors first)", "Temperate": "Late Spring", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, fertile, pH 5.5-6.5", harvest: 100-120, water: 3 }, { name: "Sweet Potato", scientific: "Ipomoea batatas", planting: { "Cold": "Not suitable", "Temperate": "Late Spring", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Late Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Sandy, well-drained, pH 5.0-6.5", harvest: 90-120, water: 5 }, { name: "Pumpkin", scientific: "Cucurbita pepo", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-6.8", harvest: 90-120, water: 7 }, { name: "Cabbage", scientific: "Brassica oleracea var. capitata", planting: { "Cold": "Early Spring", "Temperate": "Late Summer/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, pH 6.5-7.5", harvest: 70-100, water: 4 }, { name: "Beetroot", scientific: "Beta vulgaris", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, sandy, pH 6.5-7.5", harvest: 50-70, water: 4 }, { name: "Cauliflower", scientific: "Brassica oleracea var. botrytis", planting: { "Cold": "Early Spring", "Temperate": "Late Summer", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.5-7.0", harvest: 50-100, water: 4 }, { name: "Turnip", scientific: "Brassica rapa subsp. rapa", planting: { "Cold": "Early Spring/Late Summer", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.5", harvest: 40-60, water: 5 }, { name: "Asparagus", scientific: "Asparagus officinalis", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Not ideal", "Tropical": "Not suitable", "Mediterranean": "Winter", "Hot/Arid": "Early Spring" }, position: "Full Sun", soil: "Sandy, well-drained, pH 6.5-7.5", harvest: 730, water: 7 }, { name: "Artichoke", scientific: "Cynara cardunculus var. scolymus", planting: { "Cold": "Spring (indoors first)", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, fertile, pH 6.5-7.0", harvest: 180-200, water: 7 }, { name: "Okra", scientific: "Abelmoschus esculentus", planting: { "Cold": "Not suitable", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, rich, pH 6.5-7.5", harvest: 50-65, water: 4 }, { name: "Celery", scientific: "Apium graveolens", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Partial Shade", soil: "Moist, rich, pH 6.0-7.0", harvest: 85-120, water: 2 }, { name: "Leek", scientific: "Allium ampeloprasum", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 80-120, water: 5 }, { name: "Chard", scientific: "Beta vulgaris subsp. cicla", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "All Year", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 50-60, water: 3 }, { name: "Fennel", scientific: "Foeniculum vulgare", planting: { "Cold": "Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-8.0", harvest: 90-115, water: 5 }, { name: "Strawberry", scientific: "Fragaria × ananassa", planting: { "Cold": "Early Spring", "Temperate": "Late Autumn/Early Spring", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Sandy, acidic, pH 5.5-6.5", harvest: 60-90, water: 2 }, { name: "Blueberry", scientific: "Vaccinium corymbosum", planting: { "Cold": "Early Spring", "Temperate": "Autumn/Spring", "Subtropical": "Requires low-chill varieties", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Not suitable" }, position: "Full Sun/Partial Shade", soil: "Acidic, well-drained, pH 4.5-5.5", harvest: 365, water: 3 }, { name: "Raspberry", scientific: "Rubus idaeus", planting: { "Cold": "Early Spring", "Temperate": "Autumn/Spring", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.5", harvest: 365, water: 4 }, { name: "Watermelon", scientific: "Citrullus lanatus", planting: { "Cold": "Late Spring (indoors first)", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Sandy, well-drained, pH 6.0-7.0", harvest: 80-100, water: 5 }, { name: "Cantaloupe", scientific: "Cucumis melo var. cantalupensis", planting: { "Cold": "Late Spring (indoors first)", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Sandy, well-drained, pH 6.0-7.0", harvest: 70-90, water: 5 }, { name: "Grape", scientific: "Vitis vinifera", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Winter", "Tropical": "Not ideal", "Mediterranean": "Winter", "Hot/Arid": "Winter" }, position: "Full Sun", soil: "Deep, well-drained, pH 5.5-7.0", harvest: 730, water: 10 }, { name: "Pineapple", scientific: "Ananas comosus", planting: { "Cold": "Indoors only", "Temperate": "Indoors only", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Spring (in pots)", "Hot/Arid": "Spring (with shade)" }, position: "Full Sun", soil: "Sandy, acidic, well-drained, pH 4.5-5.5", harvest: 540-730, water: 14 }, { name: "Fig", scientific: "Ficus carica", planting: { "Cold": "Spring (in pots)", "Temperate": "Spring", "Subtropical": "Winter", "Tropical": "Not ideal", "Mediterranean": "Winter", "Hot/Arid": "Winter" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.5", harvest: 365, water: 10 }, { name: "Pomegranate", scientific: "Punica granatum", planting: { "Cold": "Spring (in pots)", "Temperate": "Spring", "Subtropical": "Spring", "Tropical": "Dry Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, pH 5.5-7.2", harvest: 730, water: 14 }, { name: "Kiwi", scientific: "Actinidia deliciosa", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Winter", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, fertile, pH 5.0-6.5", harvest: 1095, water: 7 }, { name: "Basil", scientific: "Ocimum basilicum", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "All Year", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring/Autumn" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 30-60, water: 2 }, { name: "Mint", scientific: "Mentha", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn/Winter", "Tropical": "All Year", "Mediterranean": "Spring/Autumn", "Hot/Arid": "Spring/Autumn (with shade)" }, position: "Partial Shade", soil: "Moist, rich, pH 6.0-7.0", harvest: 60-90, water: 2 }, { name: "Rosemary", scientific: "Salvia rosmarinus", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, sandy, pH 6.0-7.0", harvest: 90, water: 14 }, { name: "Thyme", scientific: "Thymus vulgaris", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, light, pH 6.0-8.0", harvest: 90, water: 10 }, { name: "Parsley", scientific: "Petroselinum crispum", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Rich, moist, pH 6.0-7.0", harvest: 70-90, water: 3 }, { name: "Cilantro", scientific: "Coriandrum sativum", planting: { "Cold": "Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Well-drained, pH 6.2-6.8", harvest: 45-70, water: 3 }, { name: "Dill", scientific: "Anethum graveolens", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, rich, pH 5.5-6.5", harvest: 40-60, water: 4 }, { name: "Oregano", scientific: "Origanum vulgare", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-8.0", harvest: 80-90, water: 10 }, { name: "Chives", scientific: "Allium schoenoprasum", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 60-90, water: 4 }, { name: "Sage", scientific: "Salvia officinalis", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn/Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.0", harvest: 75, water: 10 }, { name: "Lentil", scientific: "Lens culinaris", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained loam, pH 6.0-8.0", harvest: 80-110, water: 7 }, { name: "Chickpea", scientific: "Cicer arietinum", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Dry Season", "Mediterranean": "Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Sandy loam, pH 6.0-9.0", harvest: 90-100, water: 7 }, { name: "Soybean", scientific: "Glycine max", planting: { "Cold": "Late Spring", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Loam, pH 6.0-6.8", harvest: 70-120, water: 5 }, { name: "Mung Bean", scientific: "Vigna radiata", planting: { "Cold": "Not suitable", "Temperate": "Late Spring", "Subtropical": "Spring/Summer", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Sandy loam, pH 6.2-7.2", harvest: 60-90, water: 4 }, { name: "Adzuki Bean", scientific: "Vigna angularis", planting: { "Cold": "Late Spring", "Temperate": "Late Spring", "Subtropical": "Spring", "Tropical": "Dry Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, pH 5.5-6.5", harvest: 90-120, water: 5 }, { name: "Parsnip", scientific: "Pastinaca sativa", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Deep, loose, pH 6.0-7.0", harvest: 120-180, water: 5 }, { name: "Rutabaga", scientific: "Brassica napus", planting: { "Cold": "Late Spring", "Temperate": "Late Summer", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.0", harvest: 90-110, water: 4 }, { name: "Ginger", scientific: "Zingiber officinale", planting: { "Cold": "Indoors only", "Temperate": "Spring (in pots)", "Subtropical": "Early Spring", "Tropical": "All Year", "Mediterranean": "Spring (in pots)", "Hot/Arid": "Spring (with shade)" }, position: "Partial Shade", soil: "Rich, moist, well-drained, pH 5.5-6.5", harvest: 240-300, water: 3 }, { name: "Turmeric", scientific: "Curcuma longa", planting: { "Cold": "Indoors only", "Temperate": "Spring (in pots)", "Subtropical": "Early Spring", "Tropical": "All Year", "Mediterranean": "Spring (in pots)", "Hot/Arid": "Spring (with shade)" }, position: "Partial Shade", soil: "Rich, moist, well-drained, pH 6.0-7.8", harvest: 210-300, water: 3 }, { name: "Horseradish", scientific: "Armoracia rusticana", planting: { "Cold": "Early Spring", "Temperate": "Early Spring/Autumn", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Deep, rich, moist, pH 6.0-7.5", harvest: 365, water: 5 }, { name: "Arugula", scientific: "Eruca vesicaria", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "All Year", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.0", harvest: 30-40, water: 2 }, { name: "Mustard Greens", scientific: "Brassica juncea", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-7.5", harvest: 30-40, water: 3 }, { name: "Collard Greens", scientific: "Brassica oleracea var. viridis", planting: { "Cold": "Early Spring", "Temperate": "Spring/Late Summer", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, well-drained, pH 6.5-7.5", harvest: 60-75, water: 4 }, { name: "Bok Choy", scientific: "Brassica rapa subsp. chinensis", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun/Partial Shade", soil: "Rich, well-drained, pH 6.0-7.5", harvest: 45-60, water: 2 }, { name: "Endive", scientific: "Cichorium endivia", planting: { "Cold": "Late Spring", "Temperate": "Late Summer", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, well-drained, pH 5.5-7.0", harvest: 80-100, water: 4 }, { name: "Butternut Squash", scientific: "Cucurbita moschata", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-6.8", harvest: 80-100, water: 7 }, { name: "Spaghetti Squash", scientific: "Cucurbita pepo", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.5", harvest: 90-100, water: 7 }, { name: "Acorn Squash", scientific: "Cucurbita pepo", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-6.8", harvest: 80-100, water: 7 }, { name: "Delicata Squash", scientific: "Cucurbita pepo", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 80-100, water: 7 }, { name: "Kabocha Squash", scientific: "Cucurbita maxima", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "Wet Season", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-6.8", harvest: 90-100, water: 7 }, { name: "Brussels Sprouts", scientific: "Brassica oleracea var. gemmifera", planting: { "Cold": "Early Spring", "Temperate": "Late Spring/Early Summer", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Summer", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, well-drained, pH 6.8", harvest: 90-110, water: 5 }, { name: "Kohlrabi", scientific: "Brassica oleracea var. gongylodes", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn", "Tropical": "High altitude only", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Fertile, well-drained, pH 6.0-7.5", harvest: 45-60, water: 4 }, { name: "Rhubarb", scientific: "Rheum rhabarbarum", planting: { "Cold": "Early Spring", "Temperate": "Autumn/Spring", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, rich, pH 5.5-6.5", harvest: 365, water: 5 }, { name: "Tomatillo", scientific: "Physalis philadelphica", planting: { "Cold": "Late Spring", "Temperate": "Spring", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, rich, pH 6.5-7.0", harvest: 75-100, water: 3 }, { name: "Salsify", scientific: "Tragopogon porrifolius", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Deep, sandy loam, pH 6.0-7.5", harvest: 120-150, water: 6 }, { name: "Scallion", scientific: "Allium fistulosum", planting: { "Cold": "Early Spring", "Temperate": "Spring/Autumn", "Subtropical": "All Year", "Tropical": "All Year", "Mediterranean": "All Year", "Hot/Arid": "Autumn/Winter" }, position: "Full Sun", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 60-80, water: 4 }, { name: "Watercress", scientific: "Nasturtium officinale", planting: { "Cold": "Spring", "Temperate": "Spring/Autumn", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Autumn/Winter", "Hot/Arid": "Autumn (in water)" }, position: "Partial Shade (in water)", soil: "Flowing water, pH 6.5-7.5", harvest: 50-60, water: 1 }, { name: "Jerusalem Artichoke", scientific: "Helianthus tuberosus", planting: { "Cold": "Early Spring", "Temperate": "Early Spring", "Subtropical": "Autumn", "Tropical": "Dry Season (high alt.)", "Mediterranean": "Winter", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.5-7.5", harvest: 120-150, water: 7 }, { name: "Cardoon", scientific: "Cynara cardunculus", planting: { "Cold": "Spring (indoors first)", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, fertile, pH 6.5-7.0", harvest: 150-180, water: 7 }, { name: "Mushroom (Oyster)", scientific: "Pleurotus ostreatus", planting: { "Cold": "Indoors", "Temperate": "Indoors", "Subtropical": "Indoors", "Tropical": "Indoors", "Mediterranean": "Indoors", "Hot/Arid": "Indoors" }, position: "Shade/Indoors", soil: "Substrate (straw, logs)", harvest: 14-21, water: 1 }, { name: "Mushroom (Shiitake)", scientific: "Lentinula edodes", planting: { "Cold": "Indoors", "Temperate": "Indoors", "Subtropical": "Indoors", "Tropical": "Indoors", "Mediterranean": "Indoors", "Hot/Arid": "Indoors" }, position: "Shade/Indoors", soil: "Hardwood logs", harvest: 180-365, water: 10 }, { name: "Goji Berry", scientific: "Lycium barbarum", planting: { "Cold": "Spring", "Temperate": "Spring", "Subtropical": "Autumn", "Tropical": "Not suitable", "Mediterranean": "Spring", "Hot/Arid": "Spring" }, position: "Full Sun", soil: "Well-drained, pH 6.8-8.1", harvest: 730, water: 14 }, { name: "Elderberry", scientific: "Sambucus nigra", planting: { "Cold": "Spring/Autumn", "Temperate": "Spring/Autumn", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Autumn", "Hot/Arid": "Not suitable" }, position: "Full Sun/Partial Shade", soil: "Moist, well-drained, pH 5.5-6.5", harvest: 730, water: 7 }, { name: "Blackcurrant", scientific: "Ribes nigrum", planting: { "Cold": "Spring/Autumn", "Temperate": "Autumn", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Not suitable", "Hot/Arid": "Not suitable" }, position: "Full Sun/Partial Shade", soil: "Rich, well-drained, pH 6.0-7.0", harvest: 365, water: 5 }, { name: "Gooseberry", scientific: "Ribes uva-crispa", planting: { "Cold": "Spring/Autumn", "Temperate": "Autumn", "Subtropical": "Not suitable", "Tropical": "Not suitable", "Mediterranean": "Not suitable", "Hot/Arid": "Not suitable" }, position: "Full Sun/Partial Shade", soil: "Rich, well-drained, pH 6.0-6.5", harvest: 365, water: 5 }, { name: "Passion Fruit", scientific: "Passiflora edulis", planting: { "Cold": "Indoors", "Temperate": "Spring (pots)", "Subtropical": "Spring/Autumn", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring (with care)" }, position: "Full Sun", soil: "Well-drained, rich, pH 6.5-7.5", harvest: 240-365, water: 4 }, { name: "Guava", scientific: "Psidium guajava", planting: { "Cold": "Not suitable", "Temperate": "Not suitable", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Not suitable", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, pH 5.0-7.0", harvest: 730, water: 7 }, { name: "Mango", scientific: "Mangifera indica", planting: { "Cold": "Not suitable", "Temperate": "Not suitable", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Not suitable", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, pH 5.5-7.5", harvest: 1095, water: 10 }, { name: "Papaya", scientific: "Carica papaya", planting: { "Cold": "Not suitable", "Temperate": "Not suitable", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Not suitable", "Hot/Arid": "Not suitable" }, position: "Full Sun", soil: "Well-drained, rich, pH 5.5-6.5", harvest: 270-330, water: 4 }, { name: "Avocado", scientific: "Persea americana", planting: { "Cold": "Not suitable", "Temperate": "Spring (pots)", "Subtropical": "Spring", "Tropical": "All Year", "Mediterranean": "Spring", "Hot/Arid": "Spring (with care)" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.5", harvest: 1825, water: 14 } ];
 
@@ -15,6 +15,9 @@ function App() {
   const [logPlantName, setLogPlantName] = useState('');
   const [logPlantDate, setLogPlantDate] = useState(new Date().toISOString().split('T')[0]);
 
+  // NEW: State for the garden plan
+  const [gardenPlan, setGardenPlan] = useState([]);
+
   const climate = useMemo(() => locations[country]?.[city], [country, city]);
 
   const filteredPlants = useMemo(() => {
@@ -22,9 +25,37 @@ function App() {
     return plantData.filter(p =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.scientific.toLowerCase().includes(searchTerm.toLowerCase())
-    ).slice(0, 5); // Limit suggestions
+    ).slice(0, 5);
   }, [searchTerm]);
-  
+
+  // NEW: Memoized calculation for grouping and creating a timeline for the garden plan
+  const plannedGroups = useMemo(() => {
+    if (gardenPlan.length === 0) return {};
+
+    const groups = gardenPlan.reduce((acc, plant) => {
+      const climatePlanting = plant.planting[climate] || 'N/A';
+      const key = `${climatePlanting}|${plant.position}|${plant.soil}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(plant);
+      return acc;
+    }, {});
+
+    let dateOffset = 0;
+    Object.values(groups).forEach(plantGroup => {
+      plantGroup.forEach(plant => {
+        const suggestedDate = new Date();
+        suggestedDate.setDate(suggestedDate.getDate() + dateOffset);
+        plant.suggestedDate = suggestedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        dateOffset += 7; // Stagger planting by 1 week
+      });
+    });
+
+    return groups;
+  }, [gardenPlan, climate]);
+
+
   const handleAddPlantToLog = () => {
     const plant = plantData.find(p => p.name.toLowerCase() === logPlantName.toLowerCase());
     if (plant && logPlantDate) {
@@ -47,25 +78,55 @@ function App() {
     return date.toLocaleDateString();
   };
   
-  // NEW: PDF Download Handler
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = (elementId, filename) => {
     const { jsPDF } = window.jspdf;
-    const input = document.getElementById('garden-log-table');
+    const input = document.getElementById(elementId);
+    if (!input) return;
     
-    window.html2canvas(input, { scale: 2 }) // Increase scale for better resolution
+    window.html2canvas(input, { scale: 2 })
       .then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdf = new jsPDF('p', 'mm', 'a4', true);
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save("home-harvest-log.pdf");
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const canvasAspectRatio = canvasWidth / canvasHeight;
+        const pdfAspectRatio = pdfWidth / pdfHeight;
+
+        let renderWidth, renderHeight;
+
+        if (canvasAspectRatio > pdfAspectRatio) {
+            renderWidth = pdfWidth;
+            renderHeight = renderWidth / canvasAspectRatio;
+        } else {
+            renderHeight = pdfHeight;
+            renderWidth = renderHeight * canvasAspectRatio;
+        }
+
+        const xOffset = (pdfWidth - renderWidth) / 2;
+        const yOffset = (pdfHeight - renderHeight) / 2;
+
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight);
+        pdf.save(filename);
       });
   };
 
+  // NEW: Handler to add a plant to the suggested plan
+  const handleAddToPlan = (plantToAdd) => {
+    if (!gardenPlan.some(p => p.name === plantToAdd.name)) {
+      setGardenPlan(prevPlan => [...prevPlan, plantToAdd]);
+    }
+  };
+
+  // NEW: Handler to remove a plant from the suggested plan
+  const handleRemoveFromPlan = (plantToRemove) => {
+    setGardenPlan(prevPlan => prevPlan.filter(p => p.name !== plantToRemove.name));
+  };
+
+
   return (
-    <div className="min-h-screen bg-green-50/50 font-sans" style={{backgroundColor: '#F3EAD3'}}>
+    <div className="min-h-screen font-sans" style={{backgroundColor: '#F3EAD3'}}>
       <header 
         className="bg-cover bg-center text-white p-8 shadow-lg" 
         style={{backgroundImage: "url('https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?q=80&w=2070&auto=format&fit=crop')"}}
@@ -77,7 +138,6 @@ function App() {
       </header>
 
       <main className="p-4 md:p-8">
-        {/* --- Location and Plant Search Section --- */}
         <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
           <h2 className="text-2xl font-semibold text-green-800 mb-4">Find Your Perfect Plant</h2>
           
@@ -129,8 +189,21 @@ function App() {
         </section>
 
         {selectedPlant && (
-          <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold text-green-900 mb-4">{selectedPlant.name} <span className="text-xl text-gray-500">({selectedPlant.scientific})</span></h2>
+          <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h2 className="text-3xl font-bold text-green-900 mb-2">{selectedPlant.name}</h2>
+                    <p className="text-lg text-gray-500 mb-4 -mt-2">({selectedPlant.scientific})</p>
+                </div>
+                {/* NEW: Add to my garden Button */}
+                <button
+                    onClick={() => handleAddToPlan(selectedPlant)}
+                    disabled={gardenPlan.some(p => p.name === selectedPlant.name)}
+                    className="bg-orange-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                    {gardenPlan.some(p => p.name === selectedPlant.name) ? 'Added to Plan' : 'Add to my garden'}
+                </button>
+            </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-green-700 text-white">
@@ -153,18 +226,61 @@ function App() {
             </div>
           </section>
         )}
+        
+        {/* NEW: Suggested Garden Plan Section */}
+        {gardenPlan.length > 0 && (
+            <section id="garden-plan-section" className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
+                    <button
+                        onClick={() => handleDownloadPdf('garden-plan-section', 'home-harvest-plan.pdf')}
+                        className="bg-green-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                        Download Plan as PDF
+                    </button>
+                </div>
+                <p className="mb-6 text-gray-600">Plants are grouped by similar needs. The timeline is staggered weekly to spread out your harvest.</p>
+                
+                <div className="space-y-6">
+                    {Object.entries(plannedGroups).map(([key, plants]) => {
+                        const [when, where, soil] = key.split('|');
+                        return (
+                            <div key={key} className="bg-green-50/50 p-4 rounded-lg border border-green-200">
+                                <div className="bg-green-100 p-3 rounded-md mb-3">
+                                    <h3 className="font-bold text-green-800">Planting Group</h3>
+                                    <p className="text-sm text-gray-700"><span className="font-semibold">When:</span> {when}</p>
+                                    <p className="text-sm text-gray-700"><span className="font-semibold">Where:</span> {where}</p>
+                                    <p className="text-sm text-gray-700"><span className="font-semibold">Soil:</span> {soil}</p>
+                                </div>
+                                <ul className="divide-y divide-green-200">
+                                    {plants.map(plant => (
+                                        <li key={plant.name} className="flex justify-between items-center py-2">
+                                            <div>
+                                                <p className="font-semibold text-gray-800">{plant.name}</p>
+                                                <p className="text-sm text-orange-600">Suggested Planting Date: {plant.suggestedDate}</p>
+                                            </div>
+                                            <button onClick={() => handleRemoveFromPlan(plant)} className="text-red-500 hover:text-red-700 text-sm font-semibold">Remove</button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+        )}
+
 
         {/* --- My Garden Log --- */}
         <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm">
-          {/* NEW: Title with Download Button */}
           <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold text-green-800">My Garden Log</h2>
               <button
-                onClick={handleDownloadPdf}
+                onClick={() => handleDownloadPdf('garden-log-table', 'home-harvest-log.pdf')}
                 disabled={gardenLog.length === 0}
                 className="bg-green-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Download PDF
+                Download Log as PDF
               </button>
           </div>
 
@@ -201,11 +317,10 @@ function App() {
                 onClick={handleAddPlantToLog}
                 className="w-full bg-green-600 text-white p-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-                Add to Garden
+                Add to Log
             </button>
           </div>
           
-           {/* NEW: Added id to table */}
            <div className="overflow-x-auto">
                 <table id="garden-log-table" className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-green-700 text-white">
