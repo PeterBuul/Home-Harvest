@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { plantData } from './plantData.js'; // Import the data from our new file
+import { plantData } from './plantData.js'; // This line imports your data
 
-// --- DATA ---
+// --- DATA & HELPERS ---
 const locations = { "Australia": {"Sydney": "Temperate", "Melbourne": "Temperate", "Brisbane": "Subtropical", "Perth": "Mediterranean"}, "USA": {"New York": "Cold", "Los Angeles": "Mediterranean", "Chicago": "Cold", "Miami": "Tropical"}, "Canada": {"Toronto": "Cold", "Vancouver": "Temperate", "Montreal": "Cold"}, "UK": {"London": "Temperate", "Manchester": "Temperate", "Edinburgh": "Cold"}, "Germany": {"Berlin": "Cold", "Munich": "Cold", "Hamburg": "Temperate"}, "France": {"Paris": "Temperate", "Marseille": "Mediterranean", "Lyon": "Temperate"}, "India": {"Delhi": "Subtropical", "Mumbai": "Tropical", "Bangalore": "Tropical"}, "China": {"Beijing": "Cold", "Shanghai": "Subtropical", "Guangzhou": "Subtropical"}, "Brazil": {"São Paulo": "Subtropical", "Rio de Janeiro": "Tropical", "Brasília": "Tropical"}, "South Africa": {"Johannesburg": "Temperate", "Cape Town": "Mediterranean", "Durban": "Subtropical"}, "New Zealand": {"Auckland": "Temperate", "Wellington": "Temperate", "Christchurch": "Temperate"}, "Japan": {"Tokyo": "Temperate", "Osaka": "Temperate", "Sapporo": "Cold"}, "Russia": {"Moscow": "Cold", "Saint Petersburg": "Cold"}, "Italy": {"Rome": "Mediterranean", "Milan": "Temperate"}, "Spain": {"Madrid": "Mediterranean", "Barcelona": "Mediterranean"}, "Mexico": {"Mexico City": "Temperate", "Cancun": "Tropical"}, "Argentina": {"Buenos Aires": "Temperate"}, "Egypt": {"Cairo": "Hot/Arid"}, "Nigeria": {"Lagos": "Tropical"}, "Indonesia": {"Jakarta": "Tropical"}, };
-const logoPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAdASURBVHhe7Z1vyHVVFMfvP8/ZlZ297HV3Y3d3d3d3d3fXzszu7g6CgM/juuB58LwigqIICoKigAiiKCAiKIKK/PiuCCp4/Ljg+Tyf3d3d3Z3p3f2+3x+cM+95z5xzzn13zvnxAYb7/R5/sAKj5T09+w+wlY3yAZU1v5y//I9n3zPZ8+T/k5fLh8U7P//5Ym+nSj6f6Xn418n2c2Xvj4e62P/2+fL2/T23t/u57P7/e9n2w2VzR8wA+1//D9/M3u+3L/75/V89W3x8H4P7O/9f7Pj0f/nO+j7iF5H6L+H7i+35u9n/8+vF/3x4P2/29/732fdJ2/+j/+/Xn9X/v3f/r5P63+9m2/1uH/B/zP/v6v999X7u/r+/z9+fn+x/e92v73+j/b/5/5/+f9u/+9mvz/d/m+3//4vv//D9/3v5//5/8//3c//38//9///z/A/gC4AAgXQAAAC6AAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAAAF0AAAIuAA-gD.. (cut)
 
 const countryHemispheres = { "Australia": "Southern", "USA": "Northern", "Canada": "Northern", "UK": "Northern", "Germany": "Northern", "France": "Northern", "India": "Northern", "China": "Northern", "Brazil": "Southern", "South Africa": "Southern", "New Zealand": "Southern", "Japan": "Northern", "Russia": "Northern", "Italy": "Northern", "Spain": "Northern", "Mexico": "Northern", "Argentina": "Southern", "Egypt": "Northern", "Nigeria": "Northern", "Indonesia": "Southern", };
 const seasonStartMonths = {
@@ -132,48 +131,49 @@ function App() {
   }, [gardenPlan, climate, hemisphere]);
 
   const handleDownloadPdf = () => {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const bedElements = document.querySelectorAll('.garden-bed');
-    if (bedElements.length === 0) return;
+    const input = document.getElementById('garden-plan-section');
+    if (!input) return;
 
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 15;
-    const contentWidth = pageW - margin * 2;
-    
-    pdf.addImage(logoPng, 'PNG', margin, margin, 20, 20);
-    pdf.setFontSize(22);
-    pdf.text('Home Harvest Plan', pageW / 2, margin + 15, { align: 'center' });
+    // Temporarily clone the node to modify styles for printing
+    const clonedInput = input.cloneNode(true);
+    clonedInput.style.position = 'absolute';
+    clonedInput.style.left = '-9999px';
+    document.body.appendChild(clonedInput);
 
-    const promises = Array.from(bedElements).map(bed => 
-      window.html2canvas(bed, { 
-        scale: 2,
-        onclone: (doc) => {
-            doc.querySelector(`[data-bed-id="${bed.dataset.bedId}"] .action-header`).style.display = 'none';
-            doc.querySelector(`[data-bed-id="${bed.dataset.bedId}"] .notes-header`).style.display = 'table-cell';
-            doc.querySelectorAll(`[data-bed-id="${bed.dataset.bedId}"] .action-cell`).forEach(c => c.style.display = 'none');
-            doc.querySelectorAll(`[data-bed-id="${bed.dataset.bedId}"] .notes-cell`).forEach(c => {
-                c.style.display = 'table-cell';
-                c.style.border = '1px solid #eee';
-            });
-        }
-      })
-    );
-  
-    let cursorY = margin + 30;
-    Promise.all(promises).then(canvases => {
-        canvases.forEach((canvas) => {
-            const imgHeight = canvas.height * contentWidth / canvas.width;
-            if (cursorY + imgHeight > pageH - margin) {
-                pdf.addPage();
-                cursorY = margin;
-            }
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, cursorY, contentWidth, imgHeight);
-            cursorY += imgHeight + 8;
+    // Modify the clone for PDF output
+    const downloadButton = clonedInput.querySelector('.download-button-container');
+    if(downloadButton) downloadButton.style.display = 'none';
+
+    const beds = clonedInput.querySelectorAll('.garden-bed');
+    beds.forEach(bed => {
+        const actionHeader = bed.querySelector('.action-header');
+        const notesHeader = bed.querySelector('.notes-header');
+        if(actionHeader) actionHeader.style.display = 'none';
+        if(notesHeader) notesHeader.style.display = 'table-cell';
+
+        const actionCells = bed.querySelectorAll('.action-cell');
+        actionCells.forEach(c => c.style.display = 'none');
+        const notesCells = bed.querySelectorAll('.notes-cell');
+        notesCells.forEach(c => {
+            c.style.display = 'table-cell';
+            c.style.border = '1px solid #eee';
         });
-        pdf.save('home-harvest-plan.pdf');
     });
+    
+    window.html2canvas(clonedInput, { scale: 2 })
+      .then((canvas) => {
+        document.body.removeChild(clonedInput); // Clean up the cloned element
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 15;
+        const contentWidth = pdfWidth - (margin * 2);
+        const pdfHeight = (canvas.height * contentWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, pdfHeight);
+        pdf.save('home-harvest-plan.pdf');
+      });
   };
 
   const handleAddToPlan = (plantToAdd) => {
@@ -297,7 +297,7 @@ function App() {
         {gardenPlan.length > 0 && (
             <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
                 <div id="garden-plan-section">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center mb-4 download-button-container">
                         <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
                         <button
                             onClick={handleDownloadPdf}
