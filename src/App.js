@@ -36,48 +36,58 @@ function App() {
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  // REVISED: Smarter grouping and timeline calculation
+  // REVISED: Smarter grouping logic with pH tolerance
   const plannedBeds = useMemo(() => {
     if (gardenPlan.length === 0) return [];
-
-    // Helper function to extract a consistent pH key from a soil string
-    const getSoilKey = (soilString) => {
-      const phMatch = soilString.match(/ph\s*[\d.-]+/i);
-      return phMatch ? phMatch[0].toLowerCase().replace(/\s/g, '') : soilString;
+  
+    const getAveragePh = (soilString) => {
+      const phMatches = soilString.match(/(\d+(\.\d+)?)/g);
+      if (!phMatches || phMatches.length === 0) return null;
+      const numbers = phMatches.map(Number);
+      return numbers.reduce((a, b) => a + b, 0) / numbers.length;
     };
-    
-    const groups = gardenPlan.reduce((acc, plant) => {
-      const soilKey = getSoilKey(plant.soil);
-      const key = `${plant.position}|${soilKey}`; // Group by position and a normalized soil pH key
+  
+    const beds = [];
+    const sortedGardenPlan = [...gardenPlan].sort((a,b) => a.name.localeCompare(b.name));
 
-      if (!acc[key]) {
-        acc[key] = {
-          position: plant.position,
-          soil: plant.soil, // Keep original soil string for display
-          plants: [],
-        };
+    sortedGardenPlan.forEach(plant => {
+      const plantAvgPh = getAveragePh(plant.soil);
+      
+      let foundBed = false;
+      for (const bed of beds) {
+        const bedAvgPh = getAveragePh(bed.soil);
+        
+        const positionMatch = bed.position === plant.position;
+        const phCompatible = (plantAvgPh === null && bedAvgPh === null) || 
+                             (plantAvgPh !== null && bedAvgPh !== null && Math.abs(plantAvgPh - bedAvgPh) <= 0.5);
+
+        if (positionMatch && phCompatible) {
+          bed.plants.push(plant);
+          foundBed = true;
+          break;
+        }
       }
-      acc[key].plants.push(plant);
-      return acc;
-    }, {});
-
+  
+      if (!foundBed) {
+        beds.push({
+          position: plant.position,
+          soil: plant.soil, // Use the first plant's soil as the representative for the bed
+          plants: [plant]
+        });
+      }
+    });
+  
     let dateOffset = 0;
-    const beds = Object.values(groups);
-
-    // Sort beds to have a consistent order
-    beds.sort((a, b) => a.position.localeCompare(b.position) || a.soil.localeCompare(b.soil));
-
     beds.forEach(bed => {
-      // Sort plants within each bed for consistency
       bed.plants.sort((a, b) => a.name.localeCompare(b.name));
       bed.plants.forEach(plant => {
         const suggestedDate = new Date();
         suggestedDate.setDate(suggestedDate.getDate() + dateOffset);
         plant.suggestedDate = suggestedDate;
-        dateOffset += 7; // Stagger planting by 1 week
+        dateOffset += 7;
       });
     });
-
+  
     return beds;
   }, [gardenPlan]);
 
@@ -146,7 +156,7 @@ function App() {
     <div className="min-h-screen font-sans" style={{backgroundColor: '#F3EAD3'}}>
       <header 
         className="bg-cover bg-center text-white p-8 shadow-lg" 
-        style={{backgroundImage: "url('https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?q=80&w=2070&auto=format&fit=crop')"}}
+        style={{backgroundImage: "url('https://images.unsplash.com/photo-1444927714506-8492d94b4e-3d?q=80&w=2070&auto=format&fit=crop')"}}
       >
         <div className="bg-black bg-opacity-50 p-6 rounded-lg">
           <h1 className="text-5xl font-bold tracking-tight">Home Harvest</h1>
@@ -263,7 +273,7 @@ function App() {
                                 Bed {index + 1}: <span className="font-medium">{bed.position}</span>
                             </h3>
                             <p className="text-sm text-gray-600 mb-3 -mt-1">
-                                <span className="font-semibold">Soil Type:</span> {bed.soil}
+                                <span className="font-semibold">Representative Soil Type:</span> {bed.soil}
                             </p>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
                                 <table className="min-w-full divide-y divide-gray-200">
