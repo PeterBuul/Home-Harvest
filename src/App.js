@@ -17,9 +17,6 @@ function App() {
   const [city, setCity] = useState(Object.keys(locations[Object.keys(locations)[0]])[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlant, setSelectedPlant] = useState(null);
-  const [gardenLog, setGardenLog] = useState([]);
-  const [logPlantName, setLogPlantName] = useState('');
-  const [logPlantDate, setLogPlantDate] = useState(new Date().toISOString().split('T')[0]);
   const [gardenPlan, setGardenPlan] = useState([]);
 
   const climate = useMemo(() => locations[country]?.[city], [country, city]);
@@ -44,7 +41,6 @@ function App() {
   };
   
   const plannedBeds = useMemo(() => {
-    // Moved helper function inside to satisfy dependency rule
     const getSuggestedPlantingDate = (plantingSeason) => {
         const now = new Date();
         const currentMonth = now.getMonth();
@@ -84,10 +80,11 @@ function App() {
         const bedAvgPh = getAveragePh(bed.soil);
         
         const positionMatch = bed.position === plant.position;
+        const waterMatch = bed.water === plant.water; // ADDED: Check for matching water cycle
         const phCompatible = (plantAvgPh === null && bedAvgPh === null) || 
                              (plantAvgPh !== null && bedAvgPh !== null && Math.abs(plantAvgPh - bedAvgPh) <= 0.5);
 
-        if (positionMatch && phCompatible) {
+        if (positionMatch && phCompatible && waterMatch) {
           bed.plants.push(plant);
           foundBed = true;
           break;
@@ -98,6 +95,7 @@ function App() {
         beds.push({
           position: plant.position,
           soil: plant.soil,
+          water: plant.water, // ADDED: Store water cycle on the bed
           plants: [plant]
         });
       }
@@ -118,22 +116,6 @@ function App() {
     return beds;
   }, [gardenPlan, climate, hemisphere]);
 
-  const handleAddPlantToLog = () => {
-    const plant = plantData.find(p => p.name.toLowerCase() === logPlantName.toLowerCase());
-    if (plant && logPlantDate) {
-        const newEntry = {
-            id: Date.now(),
-            plant: plant,
-            plantedDate: new Date(logPlantDate),
-        };
-        setGardenLog([...gardenLog, newEntry]);
-        setLogPlantName('');
-        setLogPlantDate(new Date().toISOString().split('T')[0]);
-    } else {
-        alert("Please select a valid plant from the list.");
-    }
-  };
-  
   const handleDownloadPdf = (elementId, filename) => {
     const { jsPDF } = window.jspdf;
     const input = document.getElementById(elementId);
@@ -192,7 +174,8 @@ function App() {
       </header>
 
       <main className="p-4 md:p-8">
-        <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
+        {/* REMOVED backdrop-blur-sm to fix dropdown issue */}
+        <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
           <h2 className="text-2xl font-semibold text-green-800 mb-4">Find Your Perfect Plant</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -243,7 +226,8 @@ function App() {
         </section>
 
         {selectedPlant && (
-          <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
+          // REMOVED backdrop-blur-sm to fix dropdown issue
+          <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
             <div className="flex justify-between items-start">
                 <div>
                     <h2 className="text-3xl font-bold text-green-900 mb-2">{selectedPlant.name}</h2>
@@ -281,7 +265,8 @@ function App() {
         )}
         
         {gardenPlan.length > 0 && (
-            <section id="garden-plan-section" className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm mb-8">
+            // REMOVED backdrop-blur-sm to fix dropdown issue
+            <section id="garden-plan-section" className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
                     <button
@@ -291,7 +276,7 @@ function App() {
                         Download Plan as PDF
                     </button>
                 </div>
-                <p className="mb-6 text-gray-600">These beds group plants with similar needs. The timeline is staggered to spread out your planting and harvesting.</p>
+                <p className="mb-6 text-gray-600">These beds group plants with similar sun, soil, and water needs. The timeline is staggered to spread out your planting and harvesting.</p>
                 
                 <div className="space-y-8">
                     {plannedBeds.map((bed, index) => (
@@ -299,14 +284,16 @@ function App() {
                             <h3 className="text-xl font-bold text-green-900 mb-2">
                                 Bed {index + 1}: <span className="font-medium">{bed.position}</span>
                             </h3>
-                            <p className="text-sm text-gray-600 mb-3 -mt-1">
-                                <span className="font-semibold">Representative Soil Type:</span> {bed.soil}
-                            </p>
+                            <div className="text-sm text-gray-600 mb-3 -mt-1 space-y-1">
+                                <p><span className="font-semibold">Soil Type:</span> {bed.soil}</p>
+                                <p><span className="font-semibold">Watering:</span> Every {bed.water} days</p>
+                            </div>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-green-700 text-white">
                                         <tr>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Plant</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Watering Cycle</th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Suggested Plant Date</th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Est. Harvest Date</th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
@@ -316,6 +303,7 @@ function App() {
                                         {bed.plants.map(plant => (
                                             <tr key={plant.name}>
                                                 <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">{plant.name}</td>
+                                                <td className="px-4 py-4 whitespace-nowrap text-gray-700">Every {plant.water} days</td>
                                                 <td className="px-4 py-4 whitespace-nowrap text-orange-600 font-semibold">{plant.suggestedDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</td>
                                                 <td className="px-4 py-4 whitespace-nowrap text-green-800 font-semibold">{calculateHarvestDate(plant.suggestedDate, plant.harvest)}</td>
                                                 <td className="px-4 py-4 whitespace-nowrap">
@@ -331,84 +319,6 @@ function App() {
                 </div>
             </section>
         )}
-
-        <section className="bg-white/80 p-6 rounded-xl shadow-md backdrop-blur-sm">
-          <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold text-green-800">My Garden Log</h2>
-              <button
-                onClick={() => handleDownloadPdf('garden-log-table', 'home-harvest-log.pdf')}
-                disabled={gardenLog.length === 0}
-                className="bg-green-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                Download Log as PDF
-              </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <div className="relative md:col-span-2">
-                <label htmlFor="log-plant-name" className="block text-sm font-medium text-gray-700">Plant Name</label>
-                <input 
-                    id="log-plant-name"
-                    type="text" 
-                    value={logPlantName}
-                    onChange={e => setLogPlantName(e.target.value)}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
-                    placeholder="Search for a plant to add..."
-                />
-                 {logPlantName && plantData.filter(p => p.name.toLowerCase().includes(logPlantName.toLowerCase())).slice(0,5).length > 0 && (
-                  <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-40 overflow-auto">
-                    {plantData.filter(p => p.name.toLowerCase().includes(logPlantName.toLowerCase())).slice(0,5).map(p => (
-                      <li key={p.name} className="p-2 hover:bg-green-100 cursor-pointer" onClick={() => setLogPlantName(p.name)}>{p.name}</li>
-                    ))}
-                  </ul>
-                 )}
-            </div>
-            <div>
-                <label htmlFor="log-plant-date" className="block text-sm font-medium text-gray-700">Date Planted</label>
-                <input
-                    id="log-plant-date"
-                    type="date"
-                    value={logPlantDate}
-                    onChange={e => setLogPlantDate(e.target.value)}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
-                />
-            </div>
-            <button
-                onClick={handleAddPlantToLog}
-                className="w-full bg-green-600 text-white p-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-                Add to Log
-            </button>
-          </div>
-          
-           <div className="overflow-x-auto">
-                <table id="garden-log-table" className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-green-700 text-white">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Plant</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date Planted</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Watering Cycle</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Est. Harvest Date</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {gardenLog.length > 0 ? gardenLog.map(entry => (
-                            <tr key={entry.id}>
-                                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{entry.plant.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{entry.plantedDate.toLocaleDateString()}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">Every {entry.plant.water} days</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{calculateHarvestDate(entry.plantedDate, entry.plant.harvest)}</td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">Your garden log is empty. Add a plant above!</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-           </div>
-        </section>
-
       </main>
 
       <footer className="text-center p-4 text-sm text-gray-600 mt-8">
