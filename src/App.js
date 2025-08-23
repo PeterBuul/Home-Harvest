@@ -52,7 +52,7 @@ function App() {
     const { jsPDF } = window.jspdf;
     const input = document.getElementById('garden-log-table');
     
-    html2canvas(input, { scale: 2 }) // Increase scale for better resolution
+    window.html2canvas(input, { scale: 2 }) // Increase scale for better resolution
       .then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
