@@ -233,7 +233,7 @@ function App() {
     const margin = 15;
     const contentWidth = pageW - margin * 2;
     
-    pdf.addImage(logoSvg, 'PNG', margin, margin, 20, 20);
+    pdf.addImage(logoSvg, 'SVG', margin, margin, 20, 20);
     pdf.setFontSize(22);
     pdf.text('Home Harvest Plan', pageW / 2, margin + 15, { align: 'center' });
 
