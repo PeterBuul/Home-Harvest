@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
 // --- DATA ---
+// NOTE: Plant data has been updated with size, spacing, and climate-based harvest times.
 const locations = { "Australia": {"Sydney": "Temperate", "Melbourne": "Temperate", "Brisbane": "Subtropical", "Perth": "Mediterranean"}, "USA": {"New York": "Cold", "Los Angeles": "Mediterranean", "Chicago": "Cold", "Miami": "Tropical"}, "Canada": {"Toronto": "Cold", "Vancouver": "Temperate", "Montreal": "Cold"}, "UK": {"London": "Temperate", "Manchester": "Temperate", "Edinburgh": "Cold"}, "Germany": {"Berlin": "Cold", "Munich": "Cold", "Hamburg": "Temperate"}, "France": {"Paris": "Temperate", "Marseille": "Mediterranean", "Lyon": "Temperate"}, "India": {"Delhi": "Subtropical", "Mumbai": "Tropical", "Bangalore": "Tropical"}, "China": {"Beijing": "Cold", "Shanghai": "Subtropical", "Guangzhou": "Subtropical"}, "Brazil": {"São Paulo": "Subtropical", "Rio de Janeiro": "Tropical", "Brasília": "Tropical"}, "South Africa": {"Johannesburg": "Temperate", "Cape Town": "Mediterranean", "Durban": "Subtropical"}, "New Zealand": {"Auckland": "Temperate", "Wellington": "Temperate", "Christchurch": "Temperate"}, "Japan": {"Tokyo": "Temperate", "Osaka": "Temperate", "Sapporo": "Cold"}, "Russia": {"Moscow": "Cold", "Saint Petersburg": "Cold"}, "Italy": {"Rome": "Mediterranean", "Milan": "Temperate"}, "Spain": {"Madrid": "Mediterranean", "Barcelona": "Mediterranean"}, "Mexico": {"Mexico City": "Temperate", "Cancun": "Tropical"}, "Argentina": {"Buenos Aires": "Temperate"}, "Egypt": {"Cairo": "Hot/Arid"}, "Nigeria": {"Lagos": "Tropical"}, "Indonesia": {"Jakarta": "Tropical"}, };
 const plantData = [
     { name: "Tomato", scientific: "Solanum lycopersicum", planting: { "Cold": "Late Spring", "Temperate": "Early Spring", "Subtropical": "Autumn/Winter", "Tropical": "Dry Season", "Mediterranean": "Early Spring", "Hot/Arid": "Autumn" }, position: "Full Sun", soil: "Well-drained, pH 6.0-6.8", harvest: {"Cold": "70-90", "Temperate": "60-85", "Subtropical": "55-75", "Tropical": "50-70", "Mediterranean": "60-80", "Hot/Arid": "65-85"}, water: 3, size: "1.5m H x 0.5m W", spacing: "45-60cm apart" },
@@ -216,35 +217,48 @@ function App() {
     return beds;
   }, [gardenPlan, climate, hemisphere]);
 
-  const handleDownloadPdf = (elementId, filename) => {
-    const input = document.getElementById(elementId);
-    if (!input) return;
-    
-    window.html2canvas(input, { scale: 2 })
-      .then((canvas) => {
-        const { jsPDF } = window.jspdf;
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4', true);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const canvasAspectRatio = canvasWidth / canvasHeight;
-        const pdfAspectRatio = pdfWidth / pdfHeight;
-        let renderWidth, renderHeight, xOffset, yOffset;
+  // REVISED: New 2-column PDF generation logic
+  const handleDownloadPdf = () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const bedElements = document.querySelectorAll('.garden-bed');
+    if (bedElements.length === 0) return;
 
-        if (canvasAspectRatio > pdfAspectRatio) {
-            renderWidth = pdfWidth;
-            renderHeight = renderWidth / canvasAspectRatio;
-        } else {
-            renderHeight = pdfHeight;
-            renderWidth = renderHeight * canvasAspectRatio;
-        }
-        xOffset = (pdfWidth - renderWidth) / 2;
-        yOffset = (pdfHeight - renderHeight) / 2;
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight);
-        pdf.save(filename);
-      });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const margin = 10;
+    
+    pdf.setFontSize(18);
+    pdf.text('Your Suggested Garden Plan', pageW / 2, margin + 5, { align: 'center' });
+
+    const promises = Array.from(bedElements).map(bed => window.html2canvas(bed, { scale: 2 }));
+
+    Promise.all(promises).then(canvases => {
+        let cursorY = margin + 15;
+        const colWidth = (pageW - margin * 3) / 2;
+        let cursorX = margin;
+        
+        canvases.forEach((canvas, index) => {
+            const imgHeight = canvas.height * colWidth / canvas.width;
+
+            if (cursorY + imgHeight > pdf.internal.pageSize.getHeight() - margin) {
+                if (cursorX === margin) { // Move to second column
+                    cursorX = margin * 2 + colWidth;
+                    cursorY = margin + 15;
+                } else { // New page
+                    pdf.addPage();
+                    cursorX = margin;
+                    cursorY = margin + 15;
+                    pdf.setFontSize(18);
+                    pdf.text('Your Suggested Garden Plan (cont.)', pageW / 2, margin + 5, { align: 'center' });
+                }
+            }
+            
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', cursorX, cursorY, colWidth, imgHeight);
+            cursorY += imgHeight + 5; // 5mm gap between beds
+        });
+        
+        pdf.save('home-harvest-plan.pdf');
+    });
   };
 
   const handleAddToPlan = (plantToAdd) => {
@@ -366,61 +380,67 @@ function App() {
         )}
         
         {gardenPlan.length > 0 && (
-            <section id="garden-plan-section" className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
-                    <button
-                        onClick={() => handleDownloadPdf('garden-plan-section', 'home-harvest-plan.pdf')}
-                        className="bg-green-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                        Download Plan as PDF
-                    </button>
-                </div>
-                <p className="mb-4 text-gray-600">These beds group plants with similar sun, soil, and water needs. The timeline is staggered to spread out your planting and harvesting.</p>
-                
-                <div className="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-r-lg">
-                    <p className="font-bold">Disclaimer</p>
-                    <p className="text-sm">This is a generated guide based on general climate data. Local conditions, weather variations, and soil quality will affect actual growth and harvest times. Always use this plan as a starting point and adapt to your specific garden's needs.</p>
-                </div>
-                
-                <div className="space-y-8">
-                    {plannedBeds.map((bed, index) => (
-                        <div key={index}>
-                            <h3 className="text-xl font-bold text-green-900 mb-2">
-                                Bed {index + 1}: <span className="font-medium">{bed.position}</span>
-                            </h3>
-                            <div className="text-sm text-gray-600 mb-3 -mt-1 space-y-1">
-                                <p><span className="font-semibold">Representative Soil Type:</span> {bed.soil}</p>
-                                <p><span className="font-semibold">Watering Schedule:</span> Approx. every {bed.water} days</p>
-                            </div>
-                            <div className="overflow-x-auto rounded-lg border border-gray-200">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-green-700 text-white">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Plant</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Watering Cycle</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Suggested Plant Date</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Est. Harvest Date</th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {bed.plants.map(plant => (
-                                            <tr key={plant.name}>
-                                                <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">{plant.name}</td>
-                                                <td className="px-4 py-4 whitespace-nowrap text-gray-700">Every {plant.water} days</td>
-                                                <td className="px-4 py-4 whitespace-nowrap text-orange-600 font-semibold">{plant.suggestedDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</td>
-                                                <td className="px-4 py-4 whitespace-nowrap text-green-800 font-semibold">{calculateHarvestDate(plant.suggestedDate, plant.harvest, climate)}</td>
-                                                <td className="px-4 py-4 whitespace-nowrap">
-                                                    <button onClick={() => handleRemoveFromPlan(plant)} className="text-red-500 hover:text-red-700 text-sm font-semibold">Remove</button>
-                                                </td>
+            <section className="bg-white/80 p-6 rounded-xl shadow-md mb-8">
+                {/* This outer div is what the PDF will render */}
+                <div id="garden-plan-section">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-semibold text-green-800">Your Suggested Garden Plan</h2>
+                        <button
+                            onClick={handleDownloadPdf}
+                            className="bg-green-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 print:hidden"
+                        >
+                            Download Plan as PDF
+                        </button>
+                    </div>
+                    <p className="mb-4 text-gray-600">These beds group plants with similar sun, soil, and water needs. The timeline is staggered to spread out your planting and harvesting.</p>
+                    
+                    <div className="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-r-lg">
+                        <p className="font-bold">Disclaimer</p>
+                        <p className="text-sm">This is a generated guide based on general climate data. Local conditions, weather variations, and soil quality will affect actual growth and harvest times. Always use this plan as a starting point and adapt to your specific garden's needs.</p>
+                    </div>
+                    
+                    <div className="space-y-8">
+                        {plannedBeds.map((bed, index) => (
+                            // Added className="garden-bed" for the PDF generator to find it
+                            <div key={index} className="garden-bed break-inside-avoid">
+                                <h3 className="text-xl font-bold text-green-900 mb-2">
+                                    Bed {index + 1}: <span className="font-medium">{bed.position}</span>
+                                </h3>
+                                <div className="text-sm text-gray-600 mb-3 -mt-1 space-y-1">
+                                    <p><span className="font-semibold">Representative Soil Type:</span> {bed.soil}</p>
+                                    <p><span className="font-semibold">Watering Schedule:</span> Approx. every {bed.water} days</p>
+                                </div>
+                                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-green-700 text-white">
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Plant</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Spacing</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Avg. Size</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Suggested Plant Date</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Est. Harvest Date</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {bed.plants.map(plant => (
+                                                <tr key={plant.name}>
+                                                    <td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">{plant.name}</td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-gray-700">{plant.spacing}</td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-gray-700">{plant.size}</td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-orange-600 font-semibold">{plant.suggestedDate.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-green-800 font-semibold">{calculateHarvestDate(plant.suggestedDate, plant.harvest, climate)}</td>
+                                                    <td className="px-4 py-4 whitespace-nowrap">
+                                                        <button onClick={() => handleRemoveFromPlan(plant)} className="text-red-500 hover:text-red-700 text-sm font-semibold print:hidden">Remove</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </section>
         )}
